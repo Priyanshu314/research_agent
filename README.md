@@ -33,14 +33,14 @@ This project automates the end-to-end academic research workflow using n8n and l
 
 - ⏱️ 95%+ time saved over traditional methods  
 - ✅ Only 6% similarity score (Turnitin)  
-- 📤 Outputs stored to Google Drive, citations managed via Airtable
+- 📤 Outputs stored to Github, citations managed via Airtable
 
 ---
 
 ## ⚙️ Technologies Used
 
 - n8n (workflow automation)
-- OpenAI GPT / DeepSeek (via API)
+- OpenAI GPT (via API)
 - Airtable (reference database)
 - QuickChart (Graphviz rendering)
 - LaTeX (IEEE format export)
