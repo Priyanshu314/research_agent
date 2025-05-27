@@ -1,0 +1,1919 @@
+{
+  "name": "Research Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Research",
+        "formDescription": "Creates PDFs for Research",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic of Research",
+              "placeholder": "How ethical is AI"
+            },
+            {
+              "fieldLabel": "Description",
+              "placeholder": "Give a short description of your research methodology"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bf20f2d8-11ac-4225-9120-c001b91df6df",
+      "name": "On form submission",
+      "webhookId": "f0bbad65-8efa-411f-acae-300cb4acc188"
+    },
+    {
+      "parameters": {
+        "options": {
+          "mergeAttrs": true
+        }
+      },
+      "id": "338cebd5-105d-4753-af76-8d42fc025de3",
+      "name": "Extract Entries (XML → JSON)",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        20,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const entries = items[0].json.feed.entry;\n\nreturn entries.map(entry => ({ json: entry }));"
+      },
+      "id": "c4c35347-daa2-424e-b36b-97b91dabe353",
+      "name": "Split Entries",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        40,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const authorsArray = $json.author;\n\nreturn {\n  json: {\n    ...$json,\n    authorsFormatted: Array.isArray(authorsArray)\n      ? authorsArray.map(a => a.name?.trim()).filter(Boolean).join(', ')\n      : ''\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        900
+      ],
+      "id": "7c8f4d2d-3050-4f6b-a8d9-d46b1212fb41",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appifFBfr2jFVP36T",
+          "mode": "list",
+          "cachedResultName": "Research Base",
+          "cachedResultUrl": "https://airtable.com/appifFBfr2jFVP36T"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIy3M8swS81a27j",
+          "mode": "list",
+          "cachedResultName": "Reference Papers",
+          "cachedResultUrl": "https://airtable.com/appifFBfr2jFVP36T/tblIy3M8swS81a27j"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TItle": "={{ $json.title }}",
+            "Summary": "={{ $json.summary }}",
+            "Authors": "={{ $json.authorsFormatted }}",
+            "Link": "={{ $json.id }}",
+            "Topic": "={{ $('On form submission').item.json['Topic of Research'] }}",
+            "Description": "={{ $('On form submission').item.json.Description }}",
+            "Publish Date": "={{ $json.published }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "TItle",
+              "displayName": "TItle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Authors",
+              "displayName": "Authors",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Publish Date",
+              "displayName": "Publish Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        40,
+        1100
+      ],
+      "id": "6f2bc903-dfe6-4230-8449-31e752fe7d3c",
+      "name": "Airtable1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "aK0FBve3olOXjkM0",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        460
+      ],
+      "id": "08fb5b7e-014d-4c53-b004-cd2b7672caa3",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fields.TItle"
+            },
+            {
+              "fieldToAggregate": "fields.Summary"
+            },
+            {
+              "fieldToAggregate": "fields.Topic"
+            },
+            {
+              "fieldToAggregate": "fields.Description"
+            },
+            {
+              "fieldToAggregate": "fields.Authors"
+            },
+            {
+              "fieldToAggregate": "fields.Link"
+            },
+            {
+              "fieldToAggregate": "fields['Publish Date']"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        300,
+        940
+      ],
+      "id": "51638a61-b657-4172-909d-8afff4f939d9",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic of Research:{{ $json.Topic[0] }}\nDescription of Research: {{ $json.Description[0] }}\nSummary of Papers:\n1. \nTitle : {{ $json.TItle[0] }}\nSummary :{{ $json.Summary[0] }}\n2.\nTitle : {{ $json.TItle[1] }}\nSummary :{{ $json.Summary[1] }}\n3.\nTitle : {{ $json.TItle[2] }}\nSummary :{{ $json.Summary[2] }}\n4.\nTitle : {{ $json.TItle[3] }}\nSummary :{{ $json.Summary[3] }}\n5.\nTitle : {{ $json.TItle[4] }}\nSummary :{{ $json.Summary[4] }}",
+        "options": {
+          "systemMessage": "You are a scientific writing assistant that specializes in generating high-quality research abstracts.\nGiven:\n\n1. A research topic,\n\n2. A brief description of the proposed work, and\n\n3. Summaries of five relevant research papers,\nyour task is to write a concise and coherent abstract suitable for an academic paper.\nThe abstract should clearly state the motivation, problem, methods, and expected contributions of the proposed work.\nUse formal academic language. Do not copy content directly from the referenced summaries—synthesize and relate ideas meaningfully."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        580,
+        280
+      ],
+      "id": "169f734d-4bc6-45a2-a9d1-62ac2ff56e11",
+      "name": "Abstract Writer"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        1140
+      ],
+      "id": "41a1dd8b-5f90-4785-8ff8-075e7f3a07f3",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic of Research:{{ $json.Topic[0] }}\nDescription of Research: {{ $json.Description[0] }}\nSummary of Papers:\n1. \nTitle : {{ $json.TItle[0] }}\nSummary :{{ $json.Summary[0] }}\nAuthors : {{ $json.Authors[0] }}\n2.\nTitle : {{ $json.TItle[1] }}\nSummary :{{ $json.Summary[1] }}\nAuthors : {{ $json.Authors[1] }}\n\n3.\nTitle : {{ $json.TItle[2] }}\nSummary :{{ $json.Summary[2] }}\nAuthors : {{ $json.Authors[2] }}\n\n4.\nTitle : {{ $json.TItle[3] }}\nSummary :{{ $json.Summary[3] }}\nAuthors : {{ $json.Authors[3] }}\n\n5.\nTitle : {{ $json.TItle[4] }}\nSummary :{{ $json.Summary[4] }}\nAuthors : {{ $json.Authors[4] }}\n",
+        "options": {
+          "systemMessage": "You are an academic writing assistant that drafts the introduction section of a research paper.\nGiven:\n\nThe research topic,\n\nA brief description of the proposed work, and\n\nSummaries of five relevant research papers (including titles and authors),\nwrite a formal and structured introduction.\nFocus on:\n– Outlining the broader research area,\n– Highlighting general trends, recent advancements, and common challenges from the referenced works,\n– Avoiding deep technical details or analysis of individual papers (a separate literature survey will handle that),\n– Clearly stating the research gap and the motivation for the proposed work.\nUse formal academic tone with clear, concise language and logical flow.\n-Cite paper with provided authors where needed"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        600,
+        960
+      ],
+      "id": "8ee5ac51-d55e-48b9-99a6-bc9875fb4890",
+      "name": "Introduction Writer"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        1500
+      ],
+      "id": "afba07bf-943d-4047-aa02-e8e81036cf99",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appifFBfr2jFVP36T",
+          "mode": "list",
+          "cachedResultName": "Research Base",
+          "cachedResultUrl": "https://airtable.com/appifFBfr2jFVP36T"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9nKld7ipICEMIj",
+          "mode": "list",
+          "cachedResultName": "Research Papers",
+          "cachedResultUrl": "https://airtable.com/appifFBfr2jFVP36T/tbl9nKld7ipICEMIj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic Name": "={{ $json['Topic of Research'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Topic Name",
+              "displayName": "Topic Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Abstract",
+              "displayName": "Abstract",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Introduction",
+              "displayName": "Introduction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Literature Survey",
+              "displayName": "Literature Survey",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Methodology",
+              "displayName": "Methodology",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Results",
+              "displayName": "Results",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Conclusion",
+              "displayName": "Conclusion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        680,
+        0
+      ],
+      "id": "ab6030ed-ecd4-4a66-8555-f4f353d0efb0",
+      "name": "Paper Creation",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "aK0FBve3olOXjkM0",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1940,
+        140
+      ],
+      "id": "dacb4bb5-28de-468a-ac66-db8c9fc222b0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fields['Topic Name']"
+            },
+            {
+              "fieldToAggregate": "abstract[0]",
+              "renameField": true,
+              "outputFieldName": "Abstract"
+            },
+            {
+              "fieldToAggregate": "result",
+              "renameField": true,
+              "outputFieldName": "Introduction"
+            },
+            {
+              "fieldToAggregate": "review[0]",
+              "renameField": true,
+              "outputFieldName": "Literature Review"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        360
+      ],
+      "id": "e13f9de8-3557-44c1-a081-4bc99d9e2126",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output",
+              "renameField": true,
+              "outputFieldName": "intro"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        920,
+        720
+      ],
+      "id": "45f68a3d-99c8-46c4-a922-e4467b4282b2",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "cleanedTable",
+              "renameField": true,
+              "outputFieldName": "review"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        680
+      ],
+      "id": "67310b87-8c9d-4b17-b378-ca68338fc4d1",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appifFBfr2jFVP36T",
+          "mode": "list",
+          "cachedResultName": "Research Base",
+          "cachedResultUrl": "https://airtable.com/appifFBfr2jFVP36T"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl9nKld7ipICEMIj",
+          "mode": "list",
+          "cachedResultName": "Research Papers",
+          "cachedResultUrl": "https://airtable.com/appifFBfr2jFVP36T/tbl9nKld7ipICEMIj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic Name": "={{ $json.fields['Topic Name'][0][0] }}",
+            "Abstract": "={{ $json.Abstract[0] }}",
+            "Introduction": "={{ $json.Introduction[0][0] }}",
+            "Literature Review": "={{ $json['Literature Review'][0] }}",
+            "Methodology": "={{ $json.Methodology[0] }}"
+          },
+          "matchingColumns": [
+            "Topic Name"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Topic Name",
+              "displayName": "Topic Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Abstract",
+              "displayName": "Abstract",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Introduction",
+              "displayName": "Introduction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Literature Review",
+              "displayName": "Literature Review",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Methodology",
+              "displayName": "Methodology",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Results",
+              "displayName": "Results",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Conclusion",
+              "displayName": "Conclusion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "References",
+              "displayName": "References",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3040,
+        660
+      ],
+      "id": "fd51b4dd-bec6-4ca8-91ed-1d85f803a981",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "aK0FBve3olOXjkM0",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1860,
+        1080
+      ],
+      "id": "9b62e734-f8c8-4af9-8a7b-df9e3e7258ba",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2060,
+        620
+      ],
+      "id": "98f2f3ae-4517-4151-9d03-0c0a62cb1989",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fields['Topic Name']"
+            },
+            {
+              "fieldToAggregate": "Abstract[0]",
+              "renameField": true,
+              "outputFieldName": "Abstract"
+            },
+            {
+              "fieldToAggregate": "['Literature Review'][0]",
+              "renameField": true,
+              "outputFieldName": "Literature Review"
+            },
+            {
+              "fieldToAggregate": "data.Methodology",
+              "renameField": true,
+              "outputFieldName": "Human Input"
+            },
+            {
+              "fieldToAggregate": "Introduction[0]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        620
+      ],
+      "id": "2592ad17-4fee-4158-bf1e-194d82f6254c",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic of Research : {{ $json.fields['Topic Name'][0] }} \nAbstract :  {{ $json.Abstract[0] }}\nLiterature Review : {{ $json['Literature Review'][0] }}\nHuman Input : {{ $json['Human Input'][0] }}",
+        "options": {
+          "systemMessage": "You are a research writing assistant that generates the methodology section of a research paper.\nYou will receive:\n– The abstract of the proposed research,\n– A literature review summarizing existing techniques and gaps, and\n– Human input providing guidance or constraints (e.g., specific tools, models, datasets, or approaches to be used).\n\nYour task is to:\n– Formulate a detailed and technically sound methodology to fulfill the research goals stated in the abstract,\n– use references from the literature review,\n– Incorporate the human-provided instructions as priority constraints,\n– Use accurate technical terminology and structure the response in logical steps or modules (e.g., data collection, preprocessing, model design, evaluation),\n– Clearly justify why each step is included.\n\nMaintain a formal academic tone suitable for publication.\nDont start with a heading Methodology"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1880,
+        940
+      ],
+      "id": "0b846c95-678f-4a68-b37a-50f2a2a8a03d",
+      "name": "Methodology Agent"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2800,
+        440
+      ],
+      "id": "a65dd0a7-e137-4bfb-a838-50196750789c",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fields['Topic Name']"
+            },
+            {
+              "fieldToAggregate": "Abstract[0]",
+              "renameField": true,
+              "outputFieldName": "Abstract"
+            },
+            {
+              "fieldToAggregate": "['Literature Review'][0]",
+              "renameField": true,
+              "outputFieldName": "Literature Review"
+            },
+            {
+              "fieldToAggregate": "escapedLatex",
+              "renameField": true,
+              "outputFieldName": "Methodology"
+            },
+            {
+              "fieldToAggregate": "Introduction[0]"
+            },
+            {
+              "fieldToAggregate": "cleanedReferences[0]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        880
+      ],
+      "id": "610b38d1-9379-4e73-9d7b-9ecdb91a95af",
+      "name": "Aggregate5"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "priyanshu22101@iiitnr.edu.in",
+        "subject": "Approval and Methodology Required",
+        "message": "=Abstract :  {{ $json.Abstract[0] }}\nIntroduction : {{ $json.Introduction[0] }}\nLiterature Review : {{ $json['Literature Review'][0] }}\nGive your proposed methodology.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Methodology",
+              "placeholder": "what is your proposed methodology...?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1900,
+        720
+      ],
+      "id": "97b7d003-4e3a-4bd6-9766-15c2f1d4a85e",
+      "name": "Human input for Methodology",
+      "webhookId": "e1ef3e84-53cb-4d08-9f27-a7cae5534551",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6wlrpRLXsoOB1oiA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        1920
+      ],
+      "id": "f02ab0a1-bd93-470d-b0f2-6c6a4aaada2f",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Reference Papers : \n1.\nTitle :  {{ $json.TItle[0] }}\nAuthor : {{ $json.Authors[0] }}\nLink : {{ $json.Link[0] }}\nPublish year : {{ $json.fields['Publish Date'][0].substring(0,4) }}\n2.\nTitle :  {{ $json.TItle[1] }}\nAuthor : {{ $json.Authors[1] }}\nLink : {{ $json.Link[1] }}\nPublish year : {{ $json.fields['Publish Date'][1].substring(0,4) }}\n3.\nTitle :  {{ $json.TItle[2] }}\nAuthor : {{ $json.Authors[2] }}\nLink : {{ $json.Link[2] }}\nPublish year : {{ $json.fields['Publish Date'][2].substring(0,4) }}\n4.\nTitle :  {{ $json.TItle[3] }}\nAuthor : {{ $json.Authors[3] }}\nLink : {{ $json.Link[3] }}\nPublish year : {{ $json.fields['Publish Date'][3].substring(0,4) }}\n5.\nTitle :  {{ $json.TItle[4] }}\nAuthor : {{ $json.Authors[4] }}\nLink : {{ $json.Link[4] }}\nPublish year : {{ $json.fields['Publish Date'][4].substring(0,4) }}",
+        "options": {
+          "systemMessage": "You are a reference formatting assistant that outputs citations in LaTeX code using IEEE style.\nGiven the title, authors, publication year, and (if available) the journal/conference name, volume/issue/pages, and URL/DOI, generate references in the following format:\n\n\\bibitem{r1}\nAuthor(s). (Year). Title of the paper. \\textit{Journal/Conference Name}, \\textbf{Volume}(Issue), Page range. \n\\url{DOI or URL}\n\nGuidelines:\n– Format author names as \"Lastname, First Initial.\" and separate multiple authors with commas; use “et al.” if more than 4 authors.\n– Capitalize major words in the title and put it in sentence case.\n– Use \\textit{} for journal/conference names and \\textbf{} for volume number.\n– Use \\url{} to enclose the DOI or URL.\n– Number each entry as \\bibitem{r1}, \\bibitem{r2}, etc.\n\nOutput only the LaTeX code starting with \\bibitem{r1}, ready to paste into the \\begin{thebibliography} section of a research paper."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        620,
+        1720
+      ],
+      "id": "a357c93f-7077-40dc-be8b-5bd98f56855e",
+      "name": "Reference Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output || \"\";\nconst latexEntries = raw\n  .replace(/```latex/g, '')\n  .replace(/```/g, '')\n  .trim();\n\nconst cleanedOutput = `\\\\begin{thebibliography}{99}\\n\\n${latexEntries}\\n\\n\\\\end{thebibliography}`;\n\nreturn [\n  {\n    json: {\n      cleanedReferences: cleanedOutput\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        1320
+      ],
+      "id": "70b823c7-ea3c-4a96-911d-a0401b555966",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "cleanedReferences"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        1320
+      ],
+      "id": "afdacbb7-dffc-4f52-a5e0-278f4b9a2729",
+      "name": "Aggregate6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-3.5-turbo\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an academic assistant. Given a paragraph and a list of references in IEEE format, insert relevant inline citations using [1], [2], etc. Do not make up citations. Only use the provided reference list. If unsure, skip citing.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Paragraph:\\n{{ $json.intro[0][0][0] }}\\n\\nReferences:{{ $json.output[0] }}\"\n    }\n  ],\n  \"temperature\": 0.2\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        480
+      ],
+      "id": "abe43233-9863-4b6e-b1f1-ea39798106d0",
+      "name": "openrouter1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "aWB0GXhqRFZNR7I9",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        800
+      ],
+      "id": "808796ae-cb2e-43dd-a02a-de920531bd97",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output",
+              "renameField": true,
+              "outputFieldName": "abstract"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        960,
+        280
+      ],
+      "id": "f8551f17-516d-4fc8-91da-38c9b231ebba",
+      "name": "Aggregate7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed2834cd-e7d6-44a7-8dd4-f7dddab6797c",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        920,
+        480
+      ],
+      "id": "a46fb067-1add-4afb-b09b-18cb9c691611",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1060,
+        480
+      ],
+      "id": "9b8fc632-c67b-4c38-b6ea-9b015894f718",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output"
+            },
+            {
+              "fieldToAggregate": "intro[0]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        480
+      ],
+      "id": "49af42a3-ea50-4bfb-9a16-1f5f982dc45a",
+      "name": "Aggregate8"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Methodology :  This research involves development of a communication pipeline that connects smart devices to an AI-powered backend via the MQTT protocol for real-time data exchange. Devices continuously transmit status updates and error signals, which are processed by an LLM with access to a vector database of user manuals and device specifications. This system generates context-aware, human-readable responses, which are then delivered to users via Telegram or other messaging platforms or through smart assistants like Alexa. The implementation uses FastAPI for backend processing, vector storage, and Twilio API for multi-platform messaging.",
+        "options": {
+          "systemMessage": "You are a technical writer. Convert the given methodology into a Graphviz DOT diagram showing steps and flow\n\nReturn the DOT code only without triple quotes at start and end, enclosed in triple backticks.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2740,
+        1080
+      ],
+      "id": "68dde678-5c03-4a13-ab44-9a2888d6d5cd",
+      "name": "Flowchart Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2720,
+        1260
+      ],
+      "id": "4346708a-8c4c-4247-bf86-e07ce60bd117",
+      "name": "OpenAI Chat Model6",
+      "credentials": {
+        "openAiApi": {
+          "id": "grUtZ4z5BpS64llf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw input with triple backticks and \\n characters\nlet raw = $json.output;\n\n// Step 1: Remove triple backticks (``` or ```dot)\nraw = raw.replace(/```(?:dot)?\\\\n?/gi, \"\").replace(/```/g, \"\").trim();\n\n// Step 2: Convert escaped \\\\n to real newlines\nraw = raw.replace(/\\\\n/g, \"\\n\");\n\n// Step 3: Ensure every line ends with a semicolon if it should\nconst lines = raw.split(\"\\n\").map(line => {\n  const trimmed = line.trim();\n  // Ignore empty lines or the digraph wrapper\n  if (\n    trimmed === \"\" ||\n    trimmed.endsWith(\";\") ||\n    trimmed.endsWith(\"{\") ||\n    trimmed.endsWith(\"}\")\n  ) {\n    return line;\n  }\n  // Add semicolon if it's a valid DOT instruction\n  return line + \";\";\n});\n\n// Step 4: Join cleaned lines back into one DOT block\nconst dot = lines.join(\"\\n\");\n\n// Step 5: Encode and prepare image URL\nconst encoded = encodeURIComponent(dot);\nconst imageUrl = `https://quickchart.io/graphviz?graph=${encoded}`;\n\n// Return the cleaned DOT and image URL\nreturn [{\n  json: {\n    dotCode: dot,\n    imageUrl\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        1080
+      ],
+      "id": "0cb4b511-a8eb-4c96-9187-8036c6ba8df5",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Reference Papers : \n1.\nTitle :  {{ $json.TItle[0] }}\nAuthor : {{ $json.Authors[0] }}\nLink : {{ $json.Link[0] }}\nPublish year : {{ $json.fields['Publish Date'][0].substring(0,4) }}\n2.\nTitle :  {{ $json.TItle[1] }}\nAuthor : {{ $json.Authors[1] }}\nLink : {{ $json.Link[1] }}\nPublish year : {{ $json.fields['Publish Date'][1].substring(0,4) }}\n3.\nTitle :  {{ $json.TItle[2] }}\nAuthor : {{ $json.Authors[2] }}\nLink : {{ $json.Link[2] }}\nPublish year : {{ $json.fields['Publish Date'][2].substring(0,4) }}\n4.\nTitle :  {{ $json.TItle[3] }}\nAuthor : {{ $json.Authors[3] }}\nLink : {{ $json.Link[3] }}\nPublish year : {{ $json.fields['Publish Date'][3].substring(0,4) }}\n5.\nTitle :  {{ $json.TItle[4] }}\nAuthor : {{ $json.Authors[4] }}\nLink : {{ $json.Link[4] }}\nPublish year : {{ $json.fields['Publish Date'][4].substring(0,4) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a reference formatting assistant specialized in generating bibliographic entries in IEEE citation style.\nYou will receive the title, author(s), paper url and publication year of each paper.\nYour task is to:\n– Format each entry according to the IEEE style guide,\n– Ensure correct author formatting (e.g., \"A. B. Lastname\"),\n– Enclose the title in quotation marks and capitalize major words,\n– Format journal/conference names (if given) in italics (you may omit them if not provided),\n– Number entries [1], [2], etc., for direct placement in the reference section.\n\nOutput strictly in form of array only [   \"[1] S. Nayak, R. Patgiri, L. Waikhom, and A. Ahmed, “A Review on Edge Analytics: Issues, Challenges, Opportunities, Promises, Future Directions, and Applications,” 2023.\",   \"[2] S. Mhamudul Hasan, A. M. Alotaibi, S. Talukder, and A. R. Shahid, “Distributed Threat Intelligence at the Edge Devices: A Large Language Model-Driven Approach,” 2023.\",   \"[3] K. Zhang, G. Li, N. Lu, P. Yang, and K. Tang, “Hardware-Aware DNN Compression for Homogeneous Edge Devices,” 2023.\",   \"[4] X. Guo, A. D. Pimentel, and T. Stefanov, “AutoDiCE: Fully Automated Distributed CNN Inference at the Edge,” 2023.\",   \"[5] P. Subedi, J. Hao, I. K. Kim, and L. Ramaswamy, “AI Multi-Tenancy on Edge: Concurrent Deep Learning Model Executions and Dynamic Model Placements on Edge Devices,” 2023.\" ]\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        580,
+        600
+      ],
+      "id": "0fd181b6-5862-4ce0-b223-21940fd05e8a",
+      "name": "Citation Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.output || \"\";\n\n// Step 1: Remove code block markers\nlet latex = raw\n  .replace(/```latex/g, '')\n  .replace(/```/g, '')\n  .trim();\n\n// Step 2: Optional cleanup – fix escaped newlines (if needed)\nlatex = latex.replace(/\\\\n/g, '\\n');\n\n// Final cleaned output\nreturn [\n  {\n    json: {\n      cleanedTable: latex\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        940
+      ],
+      "id": "8a3e39ee-7299-4fc0-bf62-9d901cda9b0c",
+      "name": "Code6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        3200,
+        680
+      ],
+      "id": "a26e1ad7-d7ad-4aae-8c19-cf0d8c6fd042",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fields['Topic Name']"
+            },
+            {
+              "fieldToAggregate": "latex"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3320,
+        680
+      ],
+      "id": "1a703130-1d55-420a-8be2-04bd7191bc7d",
+      "name": "Aggregate10"
+    },
+    {
+      "parameters": {
+        "jsCode": "const topic = $input.first().json.fields['Topic Name'][0][0];\nconst abstract = $input.first().json.Abstract[0];\nconst intro = $input.first().json.Introduction[0][0];\nconst review = $input.first().json['Literature Review'][0];\nconst method= $input.first().json.Methodology[0];\nconst ref = $input.first().json.cleanedReferences[0][0];\nconst latexContent = `\n\\\\documentclass[conference]{IEEEtran}\n\\\\usepackage[utf8]{inputenc}\n\\\\usepackage{hyperref}\n\\\\usepackage{cite}\n\\\\hypersetup{\n    colorlinks=true,\n    linkcolor=blue,\n    citecolor=blue,\n    urlcolor=blue\n}\n\\\\title{${topic}}\n\n\\\\newcommand{\\\\linebreakand}{\n  \\\\end{@IEEEauthorhalign}\n  \\\\hfill\\\\mbox{}\\\\par\n  \\\\mbox{}\\\\hfill\\\\begin{@IEEEauthorhalign}\n}\n\n\\\\author{\n\n\n\\\\IEEEauthorblockN{Akshat Srivastava}\n\\\\IEEEauthorblockA{Department of DSAI \n\\\\\\\\International Institute of Information Technology\n\\\\\\\\Naya Raipur, Chhattisgarh\n\\\\\\\\Email: akshat22102@iiitnr.edu.in}\n\\\\and\n\\\\IEEEauthorblockN{Debashish Padhy}\n\\\\IEEEauthorblockA{Department of DSAI\n\\\\\\\\International Institute of Information Technology\n\\\\\\\\Naya Raipur, Chhattisgarh\n\\\\\\\\Email: debashish22102@iiitnr.edu.in}\n\n\\\\linebreakand\n\\\\IEEEauthorblockN{Priyanshu Srivastava}\n\\\\IEEEauthorblockA{Department of DSAI \n\\\\\\\\International Institute of Information Technology\n\\\\\\\\Naya Raipur, Chhattisgarh\n\\\\\\\\Email: priyanshu22101@iiitnr.edu.in}\n}\n\n\\\\begin{document}\n\\\\maketitle\n\n\\\\begin{abstract}\n\\\\hspace{}${abstract}\n\n\\\\end{abstract}\n\n\\\\begin{IEEEkeywords}\n\n\\\\end{IEEEkeywords}\n\n\\\\section{Introduction}\n\\hspace{}${intro}\n\n\\\\section{Literature Review}\n\\\\hspace{}${review}\n\n\\\\section{Methodology}\n\\\\hspace{}${method}\n\n\\\\section{Results}\n\n\n\\\\section{Conclusion}\n\n\n${ref}\n\n\\\\end{document}\n`;\n\nreturn [{ json: { latex: latexContent } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3060,
+        880
+      ],
+      "id": "ea201614-68b2-4603-8751-318be6161075",
+      "name": "LATEX output"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "Priyanshu314",
+          "mode": "list",
+          "cachedResultName": "Priyanshu314",
+          "cachedResultUrl": "https://github.com/Priyanshu314"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "research-work",
+          "mode": "list",
+          "cachedResultName": "research-work",
+          "cachedResultUrl": "https://github.com/Priyanshu314/research-work"
+        },
+        "filePath": "=docs/{{ $json.fields['Topic Name'] }}.tex",
+        "fileContent": "={{ $json.latex[0] }}",
+        "commitMessage": "paper created"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        3500,
+        680
+      ],
+      "id": "c9e8b461-325d-4bfd-8eeb-5480ae9965fb",
+      "name": "Paper Upload to Github",
+      "credentials": {
+        "githubApi": {
+          "id": "oStdiJtPjXe71n6n",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const buffer = Buffer.from($json.latex);\nreturn [\n  {\n    binary: {\n      data: {\n        data: buffer.toString('base64'),\n        fileName: 'paper.tex',\n        mimeType: 'application/x-tex'\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3500,
+        880
+      ],
+      "id": "078788f3-9d2f-4ceb-9a61-26c31048701e",
+      "name": "Download LATEX file"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3500,
+        1080
+      ],
+      "id": "e62e1023-7fe6-451c-8b12-35cd5d284e7c",
+      "name": "Download Flowchart Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.output || \"\";\n\nconst output = input.replace(/\\n/g, '\\\\\\\\');\n\nreturn [\n  {\n    json: {\n      escapedLatex: output\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2180,
+        940
+      ],
+      "id": "67160f81-1716-4347-8f64-568e77326b6f",
+      "name": "Fix Methodology formatting"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Example: input = \"Edge computing is growing rapidly [1] and faces challenges [2].\"\nconst text = $input.first().json.choices[0].message.content;\nconst output = text.replace(/\\[(\\d+)\\]/g, (match, p1) => `\\\\cite{r${p1}}`);\nreturn { result: output };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        480
+      ],
+      "id": "6f70f181-ccf3-4428-900c-5abcb4f0f24f",
+      "name": "Citing with LATEX code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic of Research:{{ $json.Topic[0] }}\nDescription of Research: {{ $json.Description[0] }}\nSummary of Papers:\n1. \nTitle : {{ $json.TItle[0] }}\nSummary :{{ $json.Summary[0] }}\nAuthors : {{ $json.Authors[0] }}\n2.\nTitle : {{ $json.TItle[1] }}\nSummary :{{ $json.Summary[1] }}\nAuthors : {{ $json.Authors[1] }}\n\n3.\nTitle : {{ $json.TItle[2] }}\nSummary :{{ $json.Summary[2] }}\nAuthors : {{ $json.Authors[2] }}\n\n4.\nTitle : {{ $json.TItle[3] }}\nSummary :{{ $json.Summary[3] }}\nAuthors : {{ $json.Authors[3] }}\n\n5.\nTitle : {{ $json.TItle[4] }}\nSummary :{{ $json.Summary[4] }}\nAuthors : {{ $json.Authors[4] }}\n",
+        "options": {
+          "systemMessage": "You are a research assistant that writes the literature survey section of a research paper.\nYou will receive:\n– A research topic and description,\n– Summaries of five relevant research papers, each including title, authors, technique used, database used, accuracy/measures, and remarks.\n\nYour task is to:\n\nWrite a brief literature survey paragraph (~100 words) that summarizes general trends, methodologies, and gaps based on the reviewed works. Do not go deep into individual papers — just synthesize common findings.\n\nFollow this with a LaTeX-formatted table that summarizes the five papers using these column headers:\n\nReviewed Paper\n\nTechnique Used\n\nDatabase Used\n\nAccuracy Measures\n\nRemarks\n\nFormat the table using the tabular environment inside a table block. Use the following column specification to ensure it fits in a single-column layout:\n|p{1.3cm}|p{1.3cm}|p{1.3cm}|p{1.3cm}|p{1.3cm}|\n\nUse \\textbf{} for headers and align content properly.\nOutput only the LaTeX code, ready to paste directly into a LaTeX document.\nEnsure both the paragraph and table appear as valid LaTeX."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        600,
+        1340
+      ],
+      "id": "6ec6673c-63a4-48d1-8325-7b5e3e1c01e1",
+      "name": "Literature Reviewer"
+    },
+    {
+      "parameters": {
+        "url": "=https://export.arxiv.org/api/query?search_query=all={{ $json['Topic of Research'] }}&start=0&max_results=5",
+        "responseFormat": "string",
+        "options": {}
+      },
+      "id": "309cef8c-3f5f-4590-a35d-be2734776356",
+      "name": "Fetch Relevant papers from arXiv",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        20,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Fetch Relevant papers from arXiv",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Paper Creation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Entries (XML → JSON)": {
+      "main": [
+        [
+          {
+            "node": "Split Entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Entries": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Abstract Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Introduction Writer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Abstract Writer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Literature Reviewer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reference Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Citation Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Introduction Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Introduction Writer": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Literature Reviewer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Abstract Writer": {
+      "main": [
+        [
+          {
+            "node": "Aggregate7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paper Creation": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Human input for Methodology",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Methodology Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Methodology Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Methodology Agent": {
+      "main": [
+        [
+          {
+            "node": "Fix Methodology formatting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate5": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LATEX output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Flowchart Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human input for Methodology": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Reference Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reference Agent": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate6": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "openrouter1": {
+      "main": [
+        [
+          {
+            "node": "Citing with LATEX code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Citation Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate7": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Aggregate8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate8": {
+      "main": [
+        [
+          {
+            "node": "openrouter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Flowchart Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flowchart Agent": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Download Flowchart Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citation Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Aggregate10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate10": {
+      "main": [
+        [
+          {
+            "node": "Paper Upload to Github",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LATEX output": {
+      "main": [
+        [
+          {
+            "node": "Download LATEX file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Download Flowchart Output": {
+      "main": [
+        []
+      ]
+    },
+    "Fix Methodology formatting": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Citing with LATEX code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Literature Reviewer": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Relevant papers from arXiv": {
+      "main": [
+        [
+          {
+            "node": "Extract Entries (XML → JSON)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "39ae9a62-8a5b-41f8-8f2b-644fc9c6709e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e583881de3251a2796c1b7239aadeb525d51700dd538d9a9c7e415768ed69112"
+  },
+  "id": "F8Ka0rYJuQmt8FMl",
+  "tags": []
+}
