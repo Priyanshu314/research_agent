@@ -1,15 +1,47 @@
-# 🧠 Research Agent (n8n + LLMs)
+# AI-Powered Research Agent 🚀
 
-An AI-powered research assistant pipeline built with [n8n](https://n8n.io), Large Language Models, and human-in-the-loop feedback. It accepts a research topic and description via a public webhook and generates structured academic content in LaTeX format.
+This project automates the end-to-end academic research workflow using n8n and large language models like OpenAI GPT and DeepSeek.
 
-## ✨ Features
+---
 
-- 📩 Public webhook to submit topic + description
-- 🧾 Auto-generates:
-  - Abstract
-  - Introduction
-  - Literature Review (with LaTeX table)
-  - Methodology (guided by prior work + human input)
-  - References (IEEE-style, LaTeX `\bibitem`)
-- 📄 Outputs a complete `.tex` file (IEEE format)
-- 📤 Optional export to Overleaf or GitHub
+## 🔧 Workflow Overview
+
+![Workflow](assets/workflow.png)
+
+---
+
+## 📄 Auto-Generated Review Table from review papers
+
+![Paper Output](assets/table.png)
+
+---
+
+## 🔧 Auto-citation using References from review papers
+
+![Workflow](assets/citation.png)
+
+![Workflow](assets/ref.png)
+
+---
+## 🔁 Flowchart from Methodology
+
+![Flowchart]()
+
+---
+
+## 📊 Results Summary
+
+- ⏱️ 95%+ time saved over traditional methods  
+- ✅ Only 6% similarity score (Turnitin)  
+- 📤 Outputs stored to Google Drive, citations managed via Airtable
+
+---
+
+## ⚙️ Technologies Used
+
+- n8n (workflow automation)
+- OpenAI GPT / DeepSeek (via API)
+- Airtable (reference database)
+- QuickChart (Graphviz rendering)
+- LaTeX (IEEE format export)
+
