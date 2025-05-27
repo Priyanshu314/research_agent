@@ -18,14 +18,14 @@ This project automates the end-to-end academic research workflow using n8n and l
 
 ## 🔧 Auto-citation using References from review papers
 
-![Workflow](assets/citation.png)
+![Citations](assets/citation.png)
 
-![Workflow](assets/ref.png)
+![Refernces](assets/references.png)
 
 ---
 ## 🔁 Flowchart from Methodology
 
-![Flowchart]()
+![Flowchart](assets/flow2.svg)
 
 ---
 
